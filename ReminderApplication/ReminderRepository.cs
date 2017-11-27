@@ -30,15 +30,13 @@ namespace ReminderApplication
         public override void Insert(Reminder entity)
         {
             if(!ValidReminder(entity)) throw new ArgumentException("Invalid Argument", nameof(entity));
-            _reminderList.Add(entity);
-            Save();
+            _reminderList.Add(entity);    
         }
 
         public override void Delete(Reminder entity)
         {
             if (!ValidReminder(entity)) throw new ArgumentException("Invalid Argument", nameof(entity));
             _reminderList.Remove(entity);
-//            Save();
         }
 
         public override List<Reminder> GetAll()
@@ -46,11 +44,12 @@ namespace ReminderApplication
             return _reminderList;
         }
 
-        private void Save()
+        public override void Update()
         {
             try
             {
-                _connection.Connect();
+                if (!_connection.IsConnect)
+                     _connection.Connect();
                 using (var streamWriter = _connection.Connection.AppendText())
                 {
                     foreach (var reminder in _reminderList)

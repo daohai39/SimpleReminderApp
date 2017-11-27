@@ -64,7 +64,18 @@ namespace ReminderApplication
         public void UpdateReminder()
         {
 
-        } 
-        
+        }
+
+        private void Save()
+        {
+            _reminderRepository.Update();
+        }
+
+        public int Close()
+        {
+            Save();
+            return -1;
+        }
+
     }
 }

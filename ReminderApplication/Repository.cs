@@ -10,6 +10,7 @@ namespace ReminderApplication
         public abstract void Insert(T entity);
         public abstract void Delete(T entity);
         public abstract List<T> GetAll();
+        public abstract void Update();
     }
         
 }
