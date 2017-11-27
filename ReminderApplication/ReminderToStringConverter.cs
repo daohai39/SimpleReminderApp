@@ -2,11 +2,11 @@
 
 namespace ReminderApplication
 {
-    public class ToStringRender : IStringConverter<Reminder>
+    public class ReminderToStringConverter : IStringConverter<Reminder>
     {
         public string ConvertToString(Reminder entity)
         {
-            return entity.Content.ToString();
+            return entity.Content;
         }
 
         public Reminder ConvertToObject(string entityString)

@@ -8,7 +8,9 @@ namespace ReminderApplication
         static void Main(string[] args)
         {
             var logger = new TextLogger();
-            var repository = new ReminderRepository();
+            var converter = new ReminderToStringConverter();
+            var connection = new TextConnection(@"E:\C# course\reminder.txt");
+            var repository = new ReminderRepository(connection, converter);       
             var reminderList = new List<Reminder>
             {
                 new Reminder {Content = "reminder 1", CreatedAt = DateTime.Now},

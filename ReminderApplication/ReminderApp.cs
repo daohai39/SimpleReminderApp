@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace ReminderApplication
 {
     public class ReminderApp
     {
-        private readonly IRepository<Reminder> _reminderRepository;
+        private readonly Repository<Reminder> _reminderRepository;
         private readonly ILogger _logger;
-        private readonly IStringConverter<Reminder> _converter;
 
-        public ReminderApp(IRepository<Reminder> reminderRepository, ILogger logger, IStringConverter<Reminder> converter)
+        public ReminderApp(Repository<Reminder> reminderRepository, ILogger logger)
         {
-            this._reminderRepository = reminderRepository;
-            this._logger = logger;
-            this._converter = converter;
+            _reminderRepository = reminderRepository;
+            _logger = logger;   
         }
 
         public void Run()
@@ -28,7 +24,7 @@ namespace ReminderApplication
             try
             {
                 _reminderRepository.Insert(reminder);
-                _logger.LogInfo("Info", $"Added new reminder: {reminder.ToString()} - Date: {DateTime.Now}");  
+                _logger.LogInfo("Info", $"Added new reminder: {reminder} - Date: {DateTime.Now}");  
             }
             catch (ArgumentException ex)
             {
@@ -37,13 +33,13 @@ namespace ReminderApplication
             }
         }
 
-        public void DeleteReminder(int id)
+        public void DeleteReminder(string name)
         {
             try
             {
-                var reminder = _reminderRepository.GetById(id);
+                var reminder = _reminderRepository.GetByName(name);
                 _reminderRepository.Delete(reminder);
-                _logger.LogInfo("Info", $"Delete reminder: {reminder.ToString()} -  Date: {DateTime.Now}"); 
+                _logger.LogInfo("Info", $"Delete reminder: {reminder} -  Date: {DateTime.Now}"); 
             }
             catch (ArgumentException ex)
             {
@@ -56,7 +52,7 @@ namespace ReminderApplication
             try
             {                                                  
                 _reminderRepository.Delete(reminder);
-                _logger.LogInfo("Info", $"Delete reminder: {reminder.ToString()} -  Date: {DateTime.Now}");
+                _logger.LogInfo("Info", $"Delete reminder: {reminder} -  Date: {DateTime.Now}");
             }
             catch (ArgumentException ex)
             {
@@ -68,12 +64,7 @@ namespace ReminderApplication
         public void UpdateReminder()
         {
 
-        }
-
-        private void Save()
-        {
-            
-        }
+        } 
         
     }
 }
