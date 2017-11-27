@@ -63,7 +63,7 @@ namespace ReminderApplication
 
         public void UpdateReminder()
         {
-
+            Save();
         }
 
         private void Save()

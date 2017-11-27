@@ -48,16 +48,23 @@ namespace ReminderApplication
         {
             try
             {
+                // Connect to original file
                 if (!_connection.IsConnect)
                      _connection.Connect();
-                using (var streamWriter = _connection.Connection.AppendText())
+                //Copy List to another file
+                var copyFile = @"E:\C# course\Reminder_copy.txt";
+                using (var streamWriter = File.AppendText(copyFile))
                 {
-                    foreach (var reminder in _reminderList)
-                    {
-                        var reminderToString = _converter.ConvertToString(reminder);
-                        streamWriter.WriteLineAsync(reminderToString);
-                    }
+                   foreach(var reminder in _reminderList)
+                   {
+                       var reminderToString = _converter.ConvertToString(reminder);
+                       streamWriter.WriteLineAsync(reminderToString);
+                   }
                 }
+                //Replace original file with new file content
+                var copy = new FileInfo(copyFile);
+                copy.Replace(_connection.Connection.FullName, @"E:\C# course\Backup.txt");
+                //Delete new file               
             }
             catch (ArgumentException ex)
             {

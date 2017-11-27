@@ -26,9 +26,10 @@ namespace ReminderApplication
 
             var disposeReminder = new Reminder {Content = "Dispose reminder", CreatedAt = DateTime.Now};
             reminderApp.AddReminder(disposeReminder);
-            reminderApp.DeleteReminder(disposeReminder);
             foreach (var reminder in repository.GetAll())
                 Console.WriteLine(reminder.ToString());
+
+            reminderApp.UpdateReminder();
         }
     }
 }
