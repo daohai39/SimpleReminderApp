@@ -15,8 +15,7 @@ namespace ReminderApplication
 
         public void Run()
         {
-            //Try load list of reminder from file       
-            //Show load                                     
+            _reminderRepository.Load();
         }
 
         public void AddReminder(Reminder reminder)
@@ -61,14 +60,14 @@ namespace ReminderApplication
             }
         }
 
-        public void UpdateReminder()
-        {
-            Save();
+        public void UpdateReminder(Reminder oldReminder, Reminder newReminder)
+        {        
+            _reminderRepository.Update(oldReminder, newReminder);
         }
 
-        private void Save()
+        public void Save()
         {
-            _reminderRepository.Update();
+            _reminderRepository.Save();
         }
 
         public int Close()

@@ -44,7 +44,16 @@ namespace ReminderApplication
             return _reminderList;
         }
 
-        public override void Update()
+        public override void Update(Reminder oldReminder, Reminder newReminder)
+        {
+            if (!_reminderList.Contains(oldReminder))
+                throw new ArgumentException();
+            var index = _reminderList.IndexOf(oldReminder);
+            _reminderList.RemoveAt(index);
+            _reminderList.Insert(index, newReminder);
+        }
+
+        public override void Save()
         {
             try
             {
@@ -69,6 +78,17 @@ namespace ReminderApplication
             catch (ArgumentException ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        public override void Load()
+        {
+            _connection.Connect();
+            if (_reminderList.Count > 0) _reminderList.Clear();
+            using (var streamReader = _connection.Connection.OpenText())
+            {
+                while (!streamReader.EndOfStream)
+                    _reminderList.Add(_converter.ConvertToObject(streamReader.ReadLine()));
             }
         }
 

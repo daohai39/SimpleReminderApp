@@ -21,15 +21,17 @@ namespace ReminderApplication
             };
                            
             var reminderApp = new ReminderApp(repository, logger);
-            foreach (var reminder in reminderList)
-                reminderApp.AddReminder(reminder);
-
-            var disposeReminder = new Reminder {Content = "Dispose reminder", CreatedAt = DateTime.Now};
-            reminderApp.AddReminder(disposeReminder);
+            reminderApp.Run();
+//            foreach (var reminder in reminderList)
+//                reminderApp.AddReminder(reminder);
+//
+//            var disposeReminder = new Reminder {Content = "Dispose reminder", CreatedAt = DateTime.Now};
+//            reminderApp.AddReminder(disposeReminder);
+//            reminderApp.DeleteReminder(disposeReminder);
             foreach (var reminder in repository.GetAll())
                 Console.WriteLine(reminder.ToString());
 
-            reminderApp.UpdateReminder();
+//            reminderApp.Save();
         }
     }
 }
