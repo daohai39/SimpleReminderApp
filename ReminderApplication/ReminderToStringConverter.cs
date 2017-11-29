@@ -8,8 +8,7 @@ namespace ReminderApplication
         {
             if (entity == null) 
                 throw new ArgumentException("Reminder can not be null");
-            var formatString = $"{entity.Content} - {entity.CreatedAt.ToString()}";
-            return formatString;
+            return $"{entity.Content} - {entity.CreatedAt.ToString()}";
         }
 
         public Reminder ConvertToObject(string entityString)

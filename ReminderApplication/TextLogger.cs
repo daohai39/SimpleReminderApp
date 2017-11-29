@@ -1,35 +1,26 @@
-﻿using System.IO;
+﻿using System;
 
 namespace ReminderApplication
 {
     public class TextLogger : ILogger
     {
-        private readonly string _path;
+        private IFileManager FileManager { get; }
 
-        public TextLogger()
+        public TextLogger(IFileManager fileManager)
         {
-            _path = @"E:\C# course\text_logger.txt";
+            FileManager = fileManager;
+        } 
+
+        public void LogError(string error)
+        {
+            FileManager.WriteFile(Format("Error", error));
         }
 
-        public TextLogger(string path)
+        public void LogInfo(string info)
         {
-            _path = path;
+            FileManager.WriteFile(Format("Info", info));
         }
 
-        public void LogError(string messageType, string error)
-        {
-            using (var streamWriter = new StreamWriter(_path, true))
-            {
-                streamWriter.WriteLine(messageType + ": " + error);
-            }
-        }
-
-        public void LogInfo(string messageType, string info)
-        {
-            using (var streamWriter = new StreamWriter(_path, true))
-            {
-                streamWriter.WriteLine(messageType + ": " + info);
-            }
-        }
+        private string Format(string messageType, string message) => $"{messageType} : {message} : {DateTime.Now}";
     }
 }

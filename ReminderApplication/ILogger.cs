@@ -2,7 +2,7 @@
 {
     public interface ILogger
     {
-        void LogError(string messageType, string error);
-        void LogInfo(string messageType, string info);
+        void LogError(string error);
+        void LogInfo(string info);
     }
 }

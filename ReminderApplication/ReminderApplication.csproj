@@ -43,8 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IConnection.cs" />
+    <Compile Include="IFileManager.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IStringConverter.cs" />
+    <Compile Include="LogFileManager.cs" />
     <Compile Include="Repository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

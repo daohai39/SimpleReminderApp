@@ -23,12 +23,12 @@ namespace ReminderApplication
             try
             {
                 _reminderRepository.Insert(reminder);
-                _logger.LogInfo("Info", $"Added new reminder: {reminder} - Date: {DateTime.Now}");  
+                _logger.LogInfo($"Added new reminder: {reminder}");  
             }
             catch (ArgumentException ex)
             {
                 Console.WriteLine("Invalid Reminder");
-                _logger.LogError("Error", $"{ex.Message} - Date: {DateTime.Now}");
+                _logger.LogError($"{ex.Message}");
             }
         }
 
@@ -38,12 +38,12 @@ namespace ReminderApplication
             {
                 var reminder = _reminderRepository.GetByName(name);
                 _reminderRepository.Delete(reminder);
-                _logger.LogInfo("Info", $"Delete reminder: {reminder} -  Date: {DateTime.Now}"); 
+                _logger.LogInfo($"Delete reminder: {reminder}"); 
             }
             catch (ArgumentException ex)
             {
                 Console.WriteLine("Invalid Reminder");
-                _logger.LogError("Error", $"{ex.Message} - Date: {DateTime.Now}");
+                _logger.LogError($"{ex.Message}");
             }
         }
         public void DeleteReminder(Reminder reminder)
@@ -51,12 +51,12 @@ namespace ReminderApplication
             try
             {                                                  
                 _reminderRepository.Delete(reminder);
-                _logger.LogInfo("Info", $"Delete reminder: {reminder} -  Date: {DateTime.Now}");
+                _logger.LogInfo($"Delete reminder: {reminder}");
             }
             catch (ArgumentException ex)
             {
                 Console.WriteLine("Invalid Reminder");
-                _logger.LogError("Error", $"{ex.Message} - Date: {DateTime.Now}");
+                _logger.LogError($"{ex.Message}");
             }
         }
 
