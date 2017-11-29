@@ -65,7 +65,7 @@ namespace ReminderApplication
             _reminderRepository.Update(oldReminder, newReminder);
         }
 
-        public void Save()
+        private void Save()
         {
             _reminderRepository.Save();
         }
