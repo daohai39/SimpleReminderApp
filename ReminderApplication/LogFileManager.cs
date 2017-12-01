@@ -14,7 +14,7 @@ namespace ReminderApplication
 
         public LogFileManager(string path)
         {
-            if(!ValidPath(path))
+            if (!ValidPath(path))
                 throw new ArgumentException("Invalid path");
             _path = path;
         }
@@ -39,6 +39,6 @@ namespace ReminderApplication
         }
 
         private bool ValidPath(string path) => (!string.IsNullOrWhiteSpace(path) &&
-                                                 path.EndsWith(".txt", StringComparison.CurrentCultureIgnoreCase)); 
+                                                path.EndsWith(".txt", StringComparison.CurrentCultureIgnoreCase));
     }
 }

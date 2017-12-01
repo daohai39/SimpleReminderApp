@@ -4,7 +4,12 @@ namespace ReminderApplication
 {
     public class TextLogger : ILogger
     {
-        private IFileManager FileManager { get; }
+        public IFileManager FileManager { get; }
+
+        public TextLogger()
+        {
+            FileManager = new LogFileManager();
+        }
 
         public TextLogger(IFileManager fileManager)
         {
@@ -21,6 +26,6 @@ namespace ReminderApplication
             FileManager.WriteFile(Format("Info", info));
         }
 
-        private string Format(string messageType, string message) => $"{messageType} : {message} : {DateTime.Now}";
+        public string Format(string messageType, string message) => $"{messageType} : {message} : {DateTime.Now}";
     }
 }

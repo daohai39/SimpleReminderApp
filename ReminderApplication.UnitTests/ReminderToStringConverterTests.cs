@@ -36,6 +36,7 @@ namespace ReminderApplication.UnitTests
 			var date = DateTime.MinValue; 
 
 			var result = converter.ConvertToObject($"{content} - {date.ToString()}");
+
 			Assert.That(result.Content, Does.Contain(content));
 			Assert.That(result.CreatedAt, Is.EqualTo(date).Within(TimeSpan.FromMilliseconds(0.0)));
 		}
