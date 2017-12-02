@@ -22,20 +22,23 @@ namespace ReminderApplication
         public void WriteFile(string message)
         {
             using (var streamWriter = new StreamWriter(_path, true))
-            {
-                streamWriter.WriteLine(message);
-            }
+                WriteFile(message, streamWriter);
+        }
+
+        public void WriteFile(string message, TextWriter writer)
+        {
+            writer.WriteLine(message);
         }
 
         public string ReadFile()
         {
-            var result = "";
             using (var streamReader = new StreamReader(_path))
-            {
-                while (!streamReader.EndOfStream)
-                    result += streamReader.ReadLine();
-            }
-            return result;
+                return ReadFile(streamReader);
+        }
+
+        public string ReadFile(TextReader reader)
+        {
+            return reader.ReadToEnd();
         }
 
         private bool ValidPath(string path) => (!string.IsNullOrWhiteSpace(path) &&
