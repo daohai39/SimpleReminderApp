@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace ReminderApplication
 {
     public class ReminderRepository : Repository<Reminder>
     {
-        private readonly List<Reminder> _reminderList;
+        public List<Reminder> ReminderList { get; private set; }
         private readonly IConnection<FileInfo> _connection;
         private readonly IStringConverter<Reminder> _converter;
 
+#if DEBUG
+        public ReminderRepository()
+        {                      
+            ReminderList = new List<Reminder>();
+            _connection = null;
+            _converter = null;
+        }
+#endif
+
         public ReminderRepository(IConnection<FileInfo> connection, IStringConverter<Reminder> converter)
         {
-            _reminderList = new List<Reminder>();
+            ReminderList = new List<Reminder>();
             _connection = connection;
             _converter = converter;
         }
@@ -29,28 +39,30 @@ namespace ReminderApplication
 
         public override void Insert(Reminder entity)
         {
-            if(!ValidReminder(entity)) throw new ArgumentException("Invalid Argument", nameof(entity));
-            _reminderList.Add(entity);    
+            if(!ValidReminder(entity)) throw new ArgumentException("Invalid reminder", nameof(entity));
+            ReminderList.Add(entity);    
         }
 
         public override void Delete(Reminder entity)
         {
-            if (!ValidReminder(entity)) throw new ArgumentException("Invalid Argument", nameof(entity));
-            _reminderList.Remove(entity);
+            if (!ValidReminder(entity)) throw new ArgumentException("Invalid reminder", nameof(entity));
+            if (!ReminderList.Contains(entity)) throw new ArgumentException("List does not have this reminder");
+            ReminderList.Remove(entity);
         }
 
-        public override List<Reminder> GetAll()
+        public override IList<Reminder> GetAll()
         {
-            return _reminderList;
+            return ReminderList;
         }
 
         public override void Update(Reminder oldReminder, Reminder newReminder)
         {
-            if (!_reminderList.Contains(oldReminder))
-                throw new ArgumentException();
-            var index = _reminderList.IndexOf(oldReminder);
-            _reminderList.RemoveAt(index);
-            _reminderList.Insert(index, newReminder);
+            if (!ValidReminder(newReminder)) throw new ArgumentException("Invalid Reminder");
+            if (!ReminderList.Contains(oldReminder))
+                throw new ArgumentException("List does not have this reminder");
+            var index = ReminderList.IndexOf(oldReminder);
+            ReminderList.RemoveAt(index);
+            ReminderList.Insert(index, newReminder);
         }
 
         public override void Save()
@@ -64,7 +76,7 @@ namespace ReminderApplication
                 var copyFile = @"E:\C# course\Reminder_copy.txt";
                 using (var streamWriter = File.AppendText(copyFile))
                 {
-                   foreach(var reminder in _reminderList)
+                   foreach(var reminder in ReminderList)
                    {
                        var reminderToString = _converter.ConvertToString(reminder);
                        streamWriter.WriteLineAsync(reminderToString);
@@ -84,14 +96,14 @@ namespace ReminderApplication
         public override void Load()
         {
             _connection.Connect();
-            if (_reminderList.Count > 0) _reminderList.Clear();
+            if (ReminderList.Count > 0) ReminderList.Clear();
             using (var streamReader = _connection.Connection.OpenText())
             {
                 while (!streamReader.EndOfStream)
-                    _reminderList.Add(_converter.ConvertToObject(streamReader.ReadLine()));
+                    ReminderList.Add(_converter.ConvertToObject(streamReader.ReadLine()));
             }
         }
 
-        private bool ValidReminder(Reminder reminder) => true;
+        private bool ValidReminder(Reminder reminder) => reminder.IsValid();
     }
 }
