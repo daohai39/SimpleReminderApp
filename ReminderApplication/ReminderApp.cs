@@ -6,6 +6,7 @@ namespace ReminderApplication
     {
         private readonly Repository<Reminder> _reminderRepository;
         private readonly ILogger _logger;
+        private bool IsRunning { get; set; }
 
         public ReminderApp(Repository<Reminder> reminderRepository, ILogger logger)
         {
@@ -15,7 +16,16 @@ namespace ReminderApplication
 
         public void Run()
         {
-            _reminderRepository.Load();
+            if (IsRunning) return;
+            Load();
+            IsRunning = true;
+        }
+
+        public void Close()
+        {
+            if (!IsRunning) return;
+            Save();
+            IsRunning = false;
         }
 
         public void AddReminder(Reminder reminder)
@@ -25,9 +35,9 @@ namespace ReminderApplication
                 _reminderRepository.Insert(reminder);
                 _logger.LogInfo($"Added new reminder: {reminder}");  
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Invalid Reminder");
+                Console.WriteLine(ex.Message);
                 _logger.LogError($"{ex.Message}");
             }
         }
@@ -40,9 +50,9 @@ namespace ReminderApplication
                 _reminderRepository.Delete(reminder);
                 _logger.LogInfo($"Delete reminder: {reminder}"); 
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Invalid Reminder");
+                Console.WriteLine(ex.Message);
                 _logger.LogError($"{ex.Message}");
             }
         }
@@ -53,27 +63,35 @@ namespace ReminderApplication
                 _reminderRepository.Delete(reminder);
                 _logger.LogInfo($"Delete reminder: {reminder}");
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Invalid Reminder");
+                Console.WriteLine(ex.Message);
                 _logger.LogError($"{ex.Message}");
             }
         }
 
         public void UpdateReminder(Reminder oldReminder, Reminder newReminder)
-        {        
-            _reminderRepository.Update(oldReminder, newReminder);
+        {
+            try
+            {
+                _reminderRepository.Update(oldReminder, newReminder);
+                _logger.LogInfo($"Update reminder: {oldReminder} replaced with {newReminder}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                _logger.LogError($"{ex.Message}");
+            }
+        }
+
+        private void Load()
+        {
+            _reminderRepository.Load();
         }
 
         private void Save()
         {
             _reminderRepository.Save();
-        }
-
-        public int Close()
-        {
-            Save();
-            return -1;
         }
 
     }

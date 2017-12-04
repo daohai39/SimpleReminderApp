@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
+
+[assembly: 
+    InternalsVisibleTo("ReminderApplication.UnitTests")]
 
 namespace ReminderApplication
 {
     public class ReminderRepository : Repository<Reminder>
     {
-        public List<Reminder> ReminderList { get; private set; }
+        internal List<Reminder> ReminderList { get; }
         private readonly IConnection<FileInfo> _connection;
         private readonly IStringConverter<Reminder> _converter;
 
@@ -37,17 +41,24 @@ namespace ReminderApplication
             throw new System.NotImplementedException();
         }
 
-        public override void Insert(Reminder entity)
+        public override void Insert(Reminder reminder)
         {
-            if(!ValidReminder(entity)) throw new ArgumentException("Invalid reminder", nameof(entity));
-            ReminderList.Add(entity);    
+            if(!ValidReminder(reminder)) throw new ArgumentException("Invalid reminder", nameof(reminder));
+            ReminderList.Add(reminder);    
         }
 
-        public override void Delete(Reminder entity)
+        public void InsertAll(Reminder[] reminders)
         {
-            if (!ValidReminder(entity)) throw new ArgumentException("Invalid reminder", nameof(entity));
-            if (!ReminderList.Contains(entity)) throw new ArgumentException("List does not have this reminder");
-            ReminderList.Remove(entity);
+            foreach (var reminder in reminders)
+               Insert(reminder); 
+        }
+
+        public override void Delete(Reminder reminder)
+        {
+            if (ReminderList.Count == 0) throw new NullReferenceException("List is empty");
+            if (!ValidReminder(reminder)) throw new ArgumentException("Invalid reminder", nameof(reminder));
+            if (!ReminderList.Contains(reminder)) throw new ArgumentException("List does not have this reminder");
+            ReminderList.Remove(reminder);
         }
 
         public override IList<Reminder> GetAll()
@@ -56,7 +67,8 @@ namespace ReminderApplication
         }
 
         public override void Update(Reminder oldReminder, Reminder newReminder)
-        {
+        {  
+            if (ReminderList.Count == 0) throw new NullReferenceException("List is empty");
             if (!ValidReminder(newReminder)) throw new ArgumentException("Invalid Reminder");
             if (!ReminderList.Contains(oldReminder))
                 throw new ArgumentException("List does not have this reminder");

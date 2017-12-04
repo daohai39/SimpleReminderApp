@@ -6,170 +6,211 @@ using NUnit.Framework;
 
 namespace ReminderApplication.UnitTests
 {
-    [TestFixture]
-    public class ReminderRepositoryTests
-    {
-        [Test]
-        [Ignore("Better test with stub")]
-        public void Insert_ByDefault_AddAReminderToList()
-        {
-            var repository = new ReminderRepository();
-            var expectedReminder = new Reminder() { Content = "Fake content", CreatedAt = new DateTime(2017, 2, 12) };
-            var expectedList = new List<Reminder> { expectedReminder};
+	[TestFixture]
+	public class ReminderRepositoryTests
+	{
+		[Test]
+		public void Insert_ByDefault_AddAReminderToList()
+		{
+			var repository = MakeRepository();
+			var expectedNewReminder = MakeFakeReminder();
 
-            repository.Insert(new Reminder() { Content = "Fake content", CreatedAt = new DateTime(2017, 2, 12) });
-                   
-            Assert.That(repository.ReminderList, Is.EquivalentTo(expectedList));
-            Assert.That(repository.ReminderList[repository.ReminderList.Count - 1], Is.EqualTo(expectedReminder));
-        }
+			repository.Insert(expectedNewReminder);
 
-        [Test]
-        public void Insert_ByDefault_AddAReminderToListUsingStubReminder()
-        {
-            var repository = MakeRepository();
-            var expectedReminder = MakeReminder();
-            var expectedList = new List<Reminder> {expectedReminder};
+			Assert.That(repository.ReminderList, Does.Contain(expectedNewReminder));
+			Assert.That(repository.ReminderList[repository.ReminderList.Count -1 ], Is.EqualTo(expectedNewReminder));
+		}
 
-            repository.Insert(new FakeReminder() { ReturnValid = true});
+		
+		[Test]
+		public void Insert_InvalidReminder_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var invalidReminder = MakeFakeReminder();
+			invalidReminder.Content = String.Empty;
 
-            Assert.That(repository.ReminderList, Is.EquivalentTo(expectedList));
-            Assert.That(repository.ReminderList[repository.ReminderList.Count - 1], Is.EqualTo(expectedReminder));
-        }
-        
-        [Test]
-        [Ignore("Better test with stub reminder")]
-        public void Insert_InvalidReminder_ThrowsException()
-        {
-            var repository = new ReminderRepository();
-            var invalidReminder = new Reminder() {Content = new string('a', 101), CreatedAt = DateTime.MinValue};
+			var result = Assert.Throws<ArgumentException>(() => repository.Insert(invalidReminder));
 
-            var result = Assert.Throws<ArgumentException>(() => repository.Insert(invalidReminder));
+			Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
+		}
 
-            Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
-        }
+		[Test]
+		public void InsertAll_ByDefault_AddRemindersToList()
+		{
+			var repository = MakeRepository();
+			var expectedListReminders = new [] {MakeFakeReminder(), MakeFakeReminder(), MakeFakeReminder()};
+		    var expectedList = new List<Reminder>(expectedListReminders);
+			
+            repository.InsertAll(expectedListReminders);
 
-        [Test]
-        public void Insert_InvalidStubReminder_ThrowsException()
-        {
-            var repository = MakeRepository();
-            var invalidStubReminder = MakeReminder();
-            invalidStubReminder.ReturnValid = false;
+            Assert.That(repository.ReminderList, Is.EquivalentTo(expectedList)); 
+		}
 
-            var result = Assert.Throws<ArgumentException>(() => repository.Insert(invalidStubReminder));
+	    [Test]
+	    public void InsertAll_HasInvalidReminder_ThrowsException()
+	    {
+	        var repository = MakeRepository();
+	        var invalidReminder = MakeFakeReminder();
+	        invalidReminder.Content = String.Empty;
+	        var expectedListReminders = new[] { MakeFakeReminder(), MakeFakeReminder(), MakeFakeReminder(), invalidReminder };
 
-            Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
-        }
-        
+            var result = Assert.Throws<ArgumentException>(() => repository.InsertAll(expectedListReminders));
 
-        [Test]
-        public void Delete_ByDefault_RemoveAReminderFromList()
-        {
-            var repository = MakeRepository();
-            var stubReminder = MakeReminder();
-            var expectedList = new List<Reminder>() {stubReminder};
-            var deletedReminder = new FakeReminder();
-                                              
-            repository.Insert(new FakeReminder());
-            repository.Insert(deletedReminder);
-            repository.Delete(deletedReminder);              
-            var result = repository.ReminderList;
+	        Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
+	    }
 
-            Assert.That(result, Is.EquivalentTo(expectedList));
-            Assert.That(result[result.Count-1], Is.EqualTo(stubReminder));
-        }
 
         [Test]
-        public void Delete_InvalidReminder_ThrowsException()
-        {
-            var repository = MakeRepository();
-            var invalidStubReminder = MakeReminder();
-            invalidStubReminder.ReturnValid = false;
+		public void Delete_ByDefault_RemoveAReminderFromList()
+		{
+			var repository = MakeRepository(); 
+			var fakeReminder = MakeFakeReminder();
+			repository.ReminderList.Add(fakeReminder);
 
-            var result = Assert.Throws<ArgumentException>(() => repository.Delete(invalidStubReminder));
+			repository.Delete(fakeReminder);
 
-            Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
-        }
+			Assert.That(repository.ReminderList, Does.Not.Contain(fakeReminder));
+		}
 
-        [Test]
-        public void Delete_UnknowReminder_ThrowsException()
-        {
-            var repository = MakeRepository();
-            var unkownStubReminder = MakeReminder();
-            unkownStubReminder.IsEqual = false;
+		[Test]
+		public void Delete_InvalidReminder_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var invalidReminder = MakeFakeReminder();
+			var fakeReminder = MakeFakeReminder();
+			invalidReminder.Content = String.Empty;
+			repository.ReminderList.Add(fakeReminder);
 
-            repository.ReminderList.Add(new FakeReminder());
-            var result = Assert.Throws<ArgumentException>(() => repository.Delete(unkownStubReminder));
+			var result = Assert.Throws<ArgumentException>(() => repository.Delete(invalidReminder));
 
-            Assert.That(result.Message, Does.Contain("List does not have this reminder").IgnoreCase);
-        }
+			Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
+		}
 
-        private ReminderRepository MakeRepository()
-        {
-            return new ReminderRepository();
-        }
+		[Test]
+		public void Delete_UnknowReminder_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var unknownReminder = MakeFakeReminder();
+			unknownReminder.Content = "Unknow content";
 
-        private FakeReminder MakeReminder()
-        {
-            return new FakeReminder();
-        }
+			repository.ReminderList.Add(MakeFakeReminder());
+			var result = Assert.Throws<ArgumentException>(() => repository.Delete(unknownReminder));
 
-        [Test]
-        public void GetAll()
-        {
-            
-        }
-    }
+			Assert.That(result.Message, Does.Contain("List does not have this reminder").IgnoreCase);
+		}
 
-    public class FakeReminder : Reminder
-    {
-        public bool ReturnValid { get; set; }
-        public bool IsEqual { get; set; }
+		[Test]
+		public void Delete_IsCalledWhenListIsEmpty_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var fakeReminder = MakeFakeReminder();
 
-        public FakeReminder()
-        {
-            IsEqual = true;
-            ReturnValid = true;
-        }
+			var result = Assert.Throws<NullReferenceException>(() => repository.Delete(fakeReminder));
 
-        public override bool IsValid()
-        {
-            return ReturnValid;  
-        }
+			Assert.That(result.Message, Does.Contain("List is empty").IgnoreCase);
+		}
 
-        public override bool Equals(Object compareObject)
-        {
-            return compareObject != null && ((FakeReminder) compareObject).IsEqual;
-        }
+		[Test]
+		public void Update_ByDefault_UpdateAReminderWithAnother()
+		{
+			var repository = MakeRepository();
+			var fakeReminder = MakeFakeReminder();
+			var updatedReminder = MakeFakeReminder();
+			updatedReminder.Content = "Updated content";
+			repository.ReminderList.Add(fakeReminder);
 
-        public override int GetHashCode() => ReturnValid.GetHashCode();
-    }
+			repository.Update(fakeReminder, updatedReminder);
 
-    public class FakeStringConverter : IStringConverter<Reminder>
-    {
-        public string ConvertToString(Reminder entity)
-        {
-            throw new System.NotImplementedException();
-        }
+			Assert.That(repository.ReminderList, Does.Not.Contain(fakeReminder));
+			Assert.That(repository.ReminderList, Does.Contain(updatedReminder));
+		}
 
-        public Reminder ConvertToObject(string entityString)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
+		[Test]
+		public void Update_IsCalledWhenListIsEmpty_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var fakeReminder = MakeFakeReminder();
+			var updatedReminder = MakeFakeReminder();
 
-    public class FakeConnection : IConnection<FileInfo>
-    {
-        public FileInfo Connection { get; }
-        public bool IsConnect { get; }
-        public bool Connect()
-        {
-            throw new System.NotImplementedException();
-        }
+			var result = Assert.Throws<NullReferenceException>(() => repository.Update(fakeReminder, updatedReminder));
 
-        public bool Disconnect()
-        {
-            throw new System.NotImplementedException();
-        }
-    }
+			Assert.That(result.Message, Does.Contain("List is empty").IgnoreCase);
+		}
+
+		[Test]
+		public void Update_InvalidReminder_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var fakeReminder = MakeFakeReminder();
+			var invalidUpdatedReminder = MakeFakeReminder();
+			invalidUpdatedReminder.Content = String.Empty;
+			repository.ReminderList.Add(fakeReminder);
+
+			var result = Assert.Throws<ArgumentException>(() => repository.Update(fakeReminder, invalidUpdatedReminder));
+
+			Assert.That(result.Message, Does.Contain("Invalid reminder").IgnoreCase);
+		}
+
+		[Test]
+		public void Update_UnknowReminder_ThrowsException()
+		{
+			var repository = MakeRepository();
+			var fakeReminder = MakeFakeReminder();
+			var unknowReminder = MakeFakeReminder();
+			unknowReminder.Content = "Unknow Content";
+			var updatedReminder = MakeFakeReminder();
+			updatedReminder.Content = "Update Content";
+			repository.ReminderList.Add(fakeReminder);
+
+			var result = Assert.Throws<ArgumentException>(() => repository.Update(unknowReminder, updatedReminder));
+
+			Assert.That(result.Message, Does.Contain("List does not have this reminder").IgnoreCase);
+		}
+
+		[Test]
+		public void GetAll_ByDefault_ReturnRepositoryReminderList()
+		{
+			var repository = MakeRepository();
+			var expected = repository.ReminderList;
+
+			var result = repository.GetAll();
+
+			Assert.That(result, Is.EqualTo(expected));
+		}
+
+		private ReminderRepository MakeRepository() => new ReminderRepository();
+
+		private Reminder MakeFakeReminder() => new Reminder() {Content = "fake content", CreatedAt = DateTime.Now};
+
+
+	}
+
+	public class FakeStringConverter : IStringConverter<Reminder>
+	{
+		public string ConvertToString(Reminder entity)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public Reminder ConvertToObject(string entityString)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
+
+	public class FakeConnection : IConnection<FileInfo>
+	{
+		public FileInfo Connection { get; }
+		public bool IsConnect { get; }
+		public bool Connect()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public bool Disconnect()
+		{
+			throw new System.NotImplementedException();
+		}
+	}
 }
 
