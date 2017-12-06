@@ -16,6 +16,7 @@ namespace ReminderApplication.UnitTests
             logger.LogError(message);
 
             Assert.That(mockFileManager.LastMessage, Does.Contain(message));
+            Assert.That(mockFileManager.Path, Does.Contain(logger.Path));
         }
 
         [Test]
@@ -27,6 +28,7 @@ namespace ReminderApplication.UnitTests
 
             logger.LogInfo(message);
 
+            Assert.That(mockFileManager.Path, Does.Contain(logger.Path));
             Assert.That(mockFileManager.LastMessage, Does.Contain(message));
         }
 
@@ -46,6 +48,7 @@ namespace ReminderApplication.UnitTests
     public class FakeFileManager : IFileManager
     {
         public string LastMessage { get; set; }
+        public string Path { get; set; }
 
         public void WriteFile(string message)
         {
@@ -55,6 +58,27 @@ namespace ReminderApplication.UnitTests
         public string ReadFile()
         {
             return LastMessage;
+        }
+
+        public void WriteFile(string path, string message)
+        {
+            Path = path;
+            LastMessage = message;
+        }
+
+        public void WriteAllText(string path, string message)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string ReadFile(string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Copy(string source, string destination, bool canOverride)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

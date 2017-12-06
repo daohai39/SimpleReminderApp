@@ -1,35 +1,61 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+
+[assembly:
+    InternalsVisibleTo("ReminderApplication.UnitTests")]
 
 namespace ReminderApplication
 {
     public class ReminderApp
     {
-        private readonly Repository<Reminder> _reminderRepository;
+        private readonly IRepository<Reminder> _reminderRepository;
         private readonly ILogger _logger;
-        private bool IsRunning { get; set; }
+        private readonly IDataAccess<Reminder> _dataAccessor;
 
-        public ReminderApp(Repository<Reminder> reminderRepository, ILogger logger)
+        public bool IsRunning { get; internal set; }
+
+        public ReminderApp(IRepository<Reminder> reminderRepository, ILogger logger, IDataAccess<Reminder> dataAccess)
         {
             _reminderRepository = reminderRepository;
-            _logger = logger;   
+            _logger = logger;
+            _dataAccessor = dataAccess;
         }
 
         public void Run()
         {
             if (IsRunning) return;
-            Load();
-            IsRunning = true;
+            try
+            {
+                var reminders = _dataAccessor.LoadData();
+                IsRunning = _reminderRepository.Load(reminders);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                _logger.LogError($"{ex.Message}");
+            }
         }
 
         public void Close()
         {
             if (!IsRunning) return;
-            Save();
-            IsRunning = false;
+            try
+            {
+                var reminderList = _reminderRepository.GetAll();
+                _dataAccessor.SaveData(reminderList);
+                IsRunning = false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                _logger.LogError($"{ex.Message}");
+            }
         }
 
         public void AddReminder(Reminder reminder)
         {
+            if (!IsRunning) return;
             try
             {
                 _reminderRepository.Insert(reminder);
@@ -44,6 +70,7 @@ namespace ReminderApplication
 
         public void DeleteReminder(string name)
         {
+            throw new NotImplementedException();
             try
             {
                 var reminder = _reminderRepository.GetByName(name);
@@ -56,12 +83,14 @@ namespace ReminderApplication
                 _logger.LogError($"{ex.Message}");
             }
         }
+
         public void DeleteReminder(Reminder reminder)
         {
+            if (!IsRunning) return;
             try
             {                                                  
                 _reminderRepository.Delete(reminder);
-                _logger.LogInfo($"Delete reminder: {reminder}");
+                _logger.LogInfo($"Deleted reminder: {reminder}");
             }
             catch (Exception ex)
             {
@@ -72,10 +101,11 @@ namespace ReminderApplication
 
         public void UpdateReminder(Reminder oldReminder, Reminder newReminder)
         {
+            if (!IsRunning) return;
             try
             {
                 _reminderRepository.Update(oldReminder, newReminder);
-                _logger.LogInfo($"Update reminder: {oldReminder} replaced with {newReminder}");
+                _logger.LogInfo($"Updated reminder: {oldReminder} replaced with {newReminder}");
             }
             catch (Exception ex)
             {
@@ -83,16 +113,5 @@ namespace ReminderApplication
                 _logger.LogError($"{ex.Message}");
             }
         }
-
-        private void Load()
-        {
-            _reminderRepository.Load();
-        }
-
-        private void Save()
-        {
-            _reminderRepository.Save();
-        }
-
     }
 }

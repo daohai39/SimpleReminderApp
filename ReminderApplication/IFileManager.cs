@@ -2,7 +2,9 @@
 {
     public interface IFileManager
     {
-        void WriteFile(string message);
-        string ReadFile();
+        void WriteFile(string path, string message);
+        void WriteAllText(string path, string message);
+        string ReadFile(string path);
+        void Copy(string source, string destination, bool canOverride);
     }
 }

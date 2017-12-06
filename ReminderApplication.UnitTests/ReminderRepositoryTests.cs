@@ -178,6 +178,44 @@ namespace ReminderApplication.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
+	    [Test]
+	    public void Load_ByDefault_ReplaceListWithANewOneAndReturnTrue()
+	    {
+	        var repository = MakeRepository();
+	        var reminderList = new List<Reminder> {MakeFakeReminder()};
+
+	        var result = repository.Load(reminderList);
+
+	        Assert.That(result, Is.True);
+            Assert.That(repository.ReminderList, Is.EquivalentTo(reminderList));
+	    }
+
+	    [Test]
+	    public void Load_EmptyList_ReturnFalse()
+	    {
+	        var repository = MakeRepository();
+	        List<Reminder> reminderList = null;
+
+	        var result = repository.Load(reminderList);
+
+	        Assert.That(result, Is.False);
+	    }
+
+	    [Test]
+	    public void Load_ListContainsInvalidReminder_ReturnFalse()
+	    {
+	        var repository = MakeRepository();
+	        var invalidReminderList = new List<Reminder> {MakeFakeReminder(), MakeFakeReminder()};
+	        var invalidReminder = MakeFakeReminder();
+            invalidReminder.Content = String.Empty;
+	        invalidReminderList.Add(invalidReminder);
+
+	        var result = repository.Load(invalidReminderList);
+
+	        Assert.That(result, Is.False);
+
+	    }
+
 		private ReminderRepository MakeRepository() => new ReminderRepository();
 
 		private Reminder MakeFakeReminder() => new Reminder() {Content = "fake content", CreatedAt = DateTime.Now};

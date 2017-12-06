@@ -62,7 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LogFileManagerTests.cs" />
+    <Compile Include="DataFileManagerTests.cs" />
+    <Compile Include="ReminderAppTests.cs" />
+    <Compile Include="TextFileManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReminderRepositoryTests.cs" />
     <Compile Include="ReminderToStringConverterTests.cs" />

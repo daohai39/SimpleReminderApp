@@ -8,7 +8,7 @@ namespace ReminderApplication
         {
             if (entity == null) 
                 throw new ArgumentException("Reminder can not be null");
-            return $"{entity.Content} - {entity.CreatedAt.ToString()}";
+            return $"{entity.Content.Trim()} - {entity.CreatedAt.ToString()}";
         }
 
         public Reminder ConvertToObject(string entityString)
@@ -21,7 +21,7 @@ namespace ReminderApplication
             var date = DateTime.MinValue;
             if (!DateTime.TryParse(substrings[1], out date))
                 throw new ArgumentException("Invalid date format");
-            var content = substrings[0];
+            var content = substrings[0].Trim();
             return new Reminder { Content = content, CreatedAt = date };
         }
     }

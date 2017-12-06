@@ -9,13 +9,13 @@ namespace ReminderApplication
     {
         static void Main(string[] args)
         {
-            var fileManager = new LogFileManager();
+            var fileManager = new TextFileManager();
             var logger = new TextLogger(fileManager);
             var converter = new ReminderToStringConverter();
-            var connection = new TextConnection(@"E:\C# course\reminder.txt");
-            var repository = new ReminderRepository(connection, converter);           
+            var dataFileManager = new DataFileManager(converter, fileManager);
+            var repository = new ReminderRepository();           
                            
-            var reminderApp = new ReminderApp(repository, logger);
+            var reminderApp = new ReminderApp(repository, logger, dataFileManager);
             reminderApp.Run();                                
 
             var disposeReminder = new Reminder {Content = "Dispose reminder", CreatedAt = DateTime.Now};
@@ -26,6 +26,7 @@ namespace ReminderApplication
             foreach (var reminder in repository.GetAll())
                 Console.WriteLine(reminder.ToString());
             reminderApp.Close();
+            Thread.Sleep(10000);
         }
     }
 }
