@@ -56,15 +56,9 @@ namespace ReminderApplication.UnitTests
 
         [Test]
         [Ignore("Not avaiable")]
-        public void WriteAllText_ByDefault_CreateTheFileThenWriteTheFileWithTheMessageOverrideIfExist()
+        public void ValidPath()
         {
-        }
 
-        [Test]
-        [Ignore("Not avaiable")]
-        public void Copy_ByDefault_CopyAnExistFileToANewFileOverrideIfAllowed()
-        {
-            
         }
     }
 }

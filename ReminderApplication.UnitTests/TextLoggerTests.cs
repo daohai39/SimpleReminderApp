@@ -66,17 +66,7 @@ namespace ReminderApplication.UnitTests
             LastMessage = message;
         }
 
-        public void WriteAllText(string path, string message)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public string ReadFile(string path)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Copy(string source, string destination, bool canOverride)
         {
             throw new System.NotImplementedException();
         }

@@ -4,50 +4,59 @@ using System.IO;
 
 namespace ReminderApplication
 {
-    public class DataFileManager : IDataAccess<Reminder>
+    public class DataFileManager : TextFileManager, IDataAccess<Reminder>
     {
-        private readonly IFileManager _fileManager;
         private readonly IStringConverter<Reminder> _converter;
         private string Path { get; } = @"E:\C# course\reminder.txt";
 
-        public DataFileManager(IStringConverter<Reminder> converter,  IFileManager fileManager)
+        public DataFileManager(IStringConverter<Reminder> converter)
+            : base()
         {
-            _fileManager = fileManager;
             _converter = converter;
         }
 
         public Reminder[] LoadData()
         {
-            var unpackedString = _fileManager.ReadFile(Path);
-            var readData = NormalizeData(unpackedString);
+            var readData = GetDataFromFile();
             var reminders = new Reminder[readData.Length];
             for (var i = 0; i < readData.Length; i++)
-                reminders[i] = UnformatData(readData[i]);
+                reminders[i] = _converter.ConvertToObject(readData[i]); 
             return reminders;
         }
 
-        public void SaveData(IList<Reminder> reminderList)
+        public bool SaveData(IList<Reminder> reminderList)
         {
+            if (reminderList.Count == 0) throw new ArgumentException("List is empty", nameof(reminderList));
             var remindersInString = "";
             foreach (var reminder in reminderList)
             {
-                remindersInString += FormatData(reminder);
+                remindersInString += _converter.ConvertToString(reminder) + "\r\n";
             }
-            _fileManager.Copy(Path, @"E:\C# course\Backup.txt", true);
-            _fileManager.WriteAllText(Path, remindersInString);   
+            Copy(Path, @"E:\C# course\Backup.txt", true);
+            WriteAllText(Path, remindersInString);
+            return true;
         }
 
-        private Reminder UnformatData(string format)
+        private string[] GetDataFromFile()
         {
-            return _converter.ConvertToObject(format);
-        }
+            var unpackedString = ReadFile(Path);  
+            var readData = unpackedString.Replace("\r\n", "\n")
+                .TrimEnd('\n')
+                .Split('\n');
+            return readData;
+        }                
 
-        private string FormatData(Reminder reminder)
+        private void WriteAllText(string path, string message)
         {
-            return _converter.ConvertToString(reminder) + "\r\n";
-        }
+            if (!ValidPath(path)) throw new ArgumentException("Invalid Path");
+            File.WriteAllText(path, message);
+        }           
 
-        private string[] NormalizeData(string unformattedString) => unformattedString.Replace("\r", "")
-                                                                    .Split('\n');
+        private void Copy(string source, string destination, bool canOverride)
+        {
+            if (!ValidPath(source)) throw new ArgumentException("Invalid Path");
+            if (!ValidPath(destination)) throw new ArgumentException("Invalid Copy Path");
+            File.Copy(source, destination, canOverride);
+        }
     }
 }

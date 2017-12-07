@@ -8,13 +8,8 @@ namespace ReminderApplication
 {
     public class TextFileManager : IFileManager
     {
-        public void WriteAllText(string path, string message)
-        {
-            if (!ValidPath(path)) throw new ArgumentException("Invalid Path");
-            File.WriteAllText(path, message);
-        }
 
-        public void WriteFile(string path, string message)
+        public virtual void WriteFile(string path, string message)
         {
             if (!ValidPath(path)) throw new ArgumentException("Invalid Path");
             using (var writer = new StreamWriter(path, true))
@@ -26,14 +21,7 @@ namespace ReminderApplication
             writer.WriteLine(message);
         }
 
-        public void Copy(string source, string destination, bool canOverride)
-        {
-            if (!ValidPath(source)) throw new ArgumentException("Invalid Path");
-            if (!ValidPath(destination)) throw new ArgumentException("Invalid Path");
-            File.Copy(source, destination, canOverride);
-        }
-
-        public string ReadFile(string path)
+        public virtual string ReadFile(string path)
         {
             if (!ValidPath(path)) throw new ArgumentException("Invalid Path");
             var result = "";
@@ -47,7 +35,7 @@ namespace ReminderApplication
             return reader.ReadToEnd();
         }
 
-        private bool ValidPath(string path) => (!string.IsNullOrWhiteSpace(path) &&
+        protected virtual bool ValidPath(string path) => (!string.IsNullOrWhiteSpace(path) &&
                                                 path.EndsWith(".txt", StringComparison.CurrentCultureIgnoreCase));
     }
 }

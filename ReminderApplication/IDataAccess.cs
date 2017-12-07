@@ -5,6 +5,6 @@ namespace ReminderApplication
     public interface IDataAccess<T>
     {
         T[] LoadData();
-        void SaveData(IList<T> objects);
+        bool SaveData(IList<T> objects);
     }
 }
